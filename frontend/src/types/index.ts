@@ -8,11 +8,17 @@ export interface PriceFeatures {
   brent_diff_7: number;
   days_since_last_change: number;
   model_name: string;
+  horizon: number;
+}
+
+export interface ForecastPoint {
+  day: number;
+  predicted_delta: number;
+  predicted_price: number;
 }
 
 export interface PredictionResponse {
   model_used: string;
-  predicted_delta: number;
-  predicted_price_tomorrow: number;
-  current_price: number;
+  horizon: number;
+  forecast: ForecastPoint[];
 }

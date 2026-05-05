@@ -1,0 +1,49 @@
+=== DATA AUDIT REPORT ===
+Shape: (2687, 21)
+
+--- Data Types ---
+Date                     str
+FEDFUNDS             float64
+SP500                float64
+VangVN_Buy Price       int64
+VangVN_Sell Price      int64
+Brent_Oil_Data       float64
+Baltic_Dry_Index       int64
+USD_VND_Data         float64
+Oil_Rigs               int64
+Gas_Rigs               int64
+Misc_Rigs              int64
+D?u DO 0,05S-II        int64
+X?ng E5 RON 92-II      int64
+X?ng RON 95-III        int64
+Unnamed: 14          float64
+Unnamed: 15          float64
+Unnamed: 16          float64
+Unnamed: 17          float64
+Unnamed: 18          float64
+Unnamed: 19          float64
+Unnamed: 20          float64
+
+Potential Time Columns: ['Date']
+
+--- Missing Values ---
+Unnamed: 14    2687
+Unnamed: 15    2687
+Unnamed: 16    2687
+Unnamed: 17    2687
+Unnamed: 18    2687
+Unnamed: 19    2687
+Unnamed: 20    2687
+
+Duplicate Rows: 0
+
+--- Time Analysis (Target Column: Date) ---
+Min Time: 2018-09-23 00:00:00
+Max Time: 2026-01-30 00:00:00
+Observed Frequencies:
+Date
+1 days    2686
+
+Irregularities/Gaps detected: 0
+
+Potential Target Variables: []

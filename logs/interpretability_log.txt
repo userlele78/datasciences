@@ -1,0 +1,6 @@
+FEATURE IMPORTANCE LOG
+price_lag_0      0.924872
+price_lag_1      0.066188
+brent_mean_30    0.006925
+regime           0.001038
+brent_lag_0      0.000976

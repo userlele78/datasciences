@@ -6,10 +6,14 @@ import pandas as pd
 import os
 import sys
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
+# Sử dụng đường dẫn tương đối dựa trên vị trí file main.py
+BASE_DIR = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+MODELS_DIR = os.path.join(BASE_DIR, "models")
+sys.path.append(BASE_DIR)
+
 from src.models.train_ensemble import FuelPriceEnsemble
 
-app = FastAPI(title="Fuel Price Forecasting API", version="1.1.0")
+app = FastAPI(title="Fuel Price Forecasting API", version="1.2.0")
 
 app.add_middleware(
     CORSMiddleware,
@@ -19,10 +23,8 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# Load all models
-MODELS_DIR = "f:/Project/DataSciences/models"
+# Load all models dynamically
 models = {}
-
 model_files = {
     "random_forest": "final_rf_model.pkl",
     "xgboost": "xgboost_delta_v2.pkl",
@@ -45,10 +47,22 @@ class PriceFeatures(BaseModel):
     brent_diff_7: float
     days_since_last_change: int
     model_name: str = "random_forest"
+    horizon: int = 1  # Dự báo bao nhiêu ngày tiếp theo
 
 @app.get("/")
 def home():
-    return {"available_models": list(models.keys()), "status": "Ready"}
+    return {"available_models": list(models.keys()), "status": "Ready", "base_dir": BASE_DIR}
+
+@app.get("/samples")
+def get_samples():
+    path = os.path.join(BASE_DIR, "data/processed/feature_dataset.csv")
+    if not os.path.exists(path):
+        raise HTTPException(status_code=404, detail="Dataset not found")
+    
+    df = pd.read_csv(path)
+    # Lấy 100 dòng cuối cùng
+    samples = df.tail(100).to_dict(orient="records")
+    return samples
 
 @app.post("/predict")
 def predict(features: PriceFeatures):
@@ -57,19 +71,34 @@ def predict(features: PriceFeatures):
     
     try:
         model = models[features.model_name]
-        # Prepare data (exclude model_name)
-        data_dict = features.model_dump()
-        del data_dict['model_name']
+        results = []
+        current_price = features.price_lag_0
         
-        input_data = pd.DataFrame([data_dict])
-        delta_pred = model.predict(input_data)[0]
-        final_price = features.price_lag_0 + delta_pred
+        # Tạo bản sao dữ liệu để dự báo đệ quy (Recursive)
+        temp_features = features.model_dump()
+        del temp_features['model_name']
+        del temp_features['horizon']
         
+        for i in range(features.horizon):
+            input_df = pd.DataFrame([temp_features])
+            delta_pred = model.predict(input_df)[0]
+            next_price = current_price + delta_pred
+            
+            results.append({
+                "day": i + 1,
+                "predicted_delta": round(float(delta_pred), 2),
+                "predicted_price": round(float(next_price), 2)
+            })
+            
+            # Cập nhật dữ liệu cho ngày tiếp theo (Giả định brent oil không đổi hoặc giảm nhẹ)
+            current_price = next_price
+            temp_features['price_lag_0'] = next_price
+            temp_features['days_since_last_change'] += 1
+            
         return {
             "model_used": features.model_name,
-            "predicted_delta": round(float(delta_pred), 2),
-            "predicted_price_tomorrow": round(float(final_price), 2),
-            "current_price": features.price_lag_0
+            "horizon": features.horizon,
+            "forecast": results
         }
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))

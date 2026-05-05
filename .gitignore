@@ -36,11 +36,11 @@ package-lock.json
 # --- Data Science & Models ---
 # Thường chúng ta sẽ ignore các file dữ liệu lớn và file mô hình binary
 # Nhưng nếu bạn muốn lưu lại mô hình nhỏ, có thể comment các dòng dưới đây
-models/*.pkl
-data/raw/*.csv
-data/processed/*.csv
-logs/*.png
-logs/*.txt
+# models/*.pkl
+# data/raw/*.csv
+# data/processed/*.csv
+# logs/*.png
+# logs/*.txt
 
 # --- IDE & OS ---
 .vscode/
