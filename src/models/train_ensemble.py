@@ -10,10 +10,18 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 
 # Paths
-DATA_PATH = "f:/Project/DataSciences/data/processed/feature_dataset.csv"
-MODEL_DIR = "f:/Project/DataSciences/models"
-os.makedirs(MODEL_DIR, exist_ok=True)
+from pathlib import Path
+import os
 
+# Lấy thư mục gốc project (datasciences/)
+BASE_DIR = Path(__file__).resolve().parents[2]
+
+# Đường dẫn data & model
+DATA_PATH = BASE_DIR / "data" / "processed" / "feature_dataset.csv"
+MODEL_DIR = BASE_DIR / "models"
+
+# Tạo thư mục nếu chưa có
+os.makedirs(MODEL_DIR, exist_ok=True)
 class FuelPriceEnsemble:
     def __init__(self):
         self.rf = RandomForestRegressor(n_estimators=200, random_state=42)

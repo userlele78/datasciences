@@ -6,12 +6,14 @@ from sklearn.ensemble import RandomForestRegressor
 from statsmodels.tsa.statespace.sarimax import SARIMAX
 import os
 import sys
+from pathlib import Path
+import os
 
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '../..')))
 from src.utils.metrics import calculate_metrics
 from src.models.train_ensemble import FuelPriceEnsemble
-
-DATA_PATH = "f:/Project/DataSciences/data/processed/feature_dataset.csv"
+BASE_DIR = Path(__file__).resolve().parents[2]
+DATA_PATH = BASE_DIR / "data" / "processed" / "feature_dataset.csv"
 
 def run_comparison():
     df = pd.read_csv(DATA_PATH)
