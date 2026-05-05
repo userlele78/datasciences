@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fuel Price Predictor - AI Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+    <script src="https://unpkg.com/recharts/umd/Recharts.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #0f172a; color: #f8fafc; }
+        .glass { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border: 1px solid rgba(255, 255, 255, 0.1); }
+        .accent-gradient { background: linear-gradient(135deg, #38bdf8 0%, #818cf8 100%); }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+        const { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, AreaChart, Area } = Recharts;
+
+        const App = () => {
+            const [loading, setLoading] = useState(false);
+            const [prediction, setPrediction] = useState(null);
+            const [formData, setFormData] = useState({
+                price_lag_0: 23000,
+                brent_lag_0: 85.5,
+                brent_lag_7: 82.0,
+                brent_mean_30: 83.2,
+                regime: 0,
+                brent_diff_1: 0.5,
+                brent_diff_7: 3.5,
+                days_since_last_change: 5
+            });
+
+            // Mock historical data for chart
+            const chartData = [
+                { name: 'Day -6', price: 22800 },
+                { name: 'Day -5', price: 22850 },
+                { name: 'Day -4', price: 22900 },
+                { name: 'Day -3', price: 22950 },
+                { name: 'Day -2', price: 23000 },
+                { name: 'Day -1', price: 23000 },
+                { name: 'Today', price: 23000 },
+                { name: 'Tomorrow (AI)', price: prediction ? prediction.predicted_price_tomorrow : 23000 },
+            ];
+
+            const handlePredict = async (e) => {
+                e.preventDefault();
+                setLoading(true);
+                try {
+                    const response = await fetch('http://localhost:8000/predict', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(formData)
+                    });
+                    const data = await response.json();
+                    setPrediction(data);
+                } catch (error) {
+                    alert("Error: Make sure your FastAPI server is running on localhost:8000");
+                }
+                setLoading(false);
+            };
+
+            return (
+                <div className="min-h-screen p-4 md:p-8">
+                    <header className="mb-8 flex justify-between items-center">
+                        <div>
+                            <h1 className="text-3xl font-bold text-sky-400">FuelPrice AI</h1>
+                            <p className="text-slate-400">Enterprise Forecasting System v1.0</p>
+                        </div>
+                        <div className="flex gap-2">
+                            <span className="px-3 py-1 rounded-full bg-green-500/20 text-green-400 text-sm border border-green-500/30">System Online</span>
+                        </div>
+                    </header>
+
+                    <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                        {/* Control Panel */}
+                        <div className="glass p-6 rounded-2xl">
+                            <h2 className="text-xl font-semibold mb-6 flex items-center gap-2">
+                                <span className="w-2 h-6 accent-gradient rounded-full"></span>
+                                Prediction Controls
+                            </h2>
+                            <form onSubmit={handlePredict} className="space-y-4">
+                                {Object.keys(formData).map(key => (
+                                    <div key={key}>
+                                        <label className="block text-xs font-medium text-slate-400 uppercase tracking-wider mb-1">
+                                            {key.replace(/_/g, ' ')}
+                                        </label>
+                                        <input 
+                                            type="number" 
+                                            step="any"
+                                            className="w-full bg-slate-900/50 border border-slate-700 rounded-lg px-4 py-2 focus:ring-2 focus:ring-sky-500 outline-none transition-all"
+                                            value={formData[key]}
+                                            onChange={(e) => setFormData({...formData, [key]: parseFloat(e.target.value)})}
+                                        />
+                                    </div>
+                                ))}
+                                <button 
+                                    type="submit" 
+                                    disabled={loading}
+                                    className="w-full py-4 rounded-xl accent-gradient font-bold text-white shadow-lg shadow-sky-500/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
+                                >
+                                    {loading ? 'Analyzing Data...' : 'GENERATE FORECAST'}
+                                </button>
+                            </form>
+                        </div>
+
+                        {/* Visualization & Results */}
+                        <div className="lg:col-span-2 space-y-8">
+                            {/* Summary Cards */}
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                                <div className="glass p-6 rounded-2xl">
+                                    <p className="text-slate-400 text-sm">Current Price</p>
+                                    <h3 className="text-2xl font-bold text-white">{formData.price_lag_0.toLocaleString()} VND</h3>
+                                </div>
+                                <div className="glass p-6 rounded-2xl border-sky-500/30">
+                                    <p className="text-slate-400 text-sm">AI Forecast (Tomorrow)</p>
+                                    <h3 className="text-2xl font-bold text-sky-400">
+                                        {prediction ? prediction.predicted_price_tomorrow.toLocaleString() : '---'} VND
+                                    </h3>
+                                </div>
+                                <div className="glass p-6 rounded-2xl">
+                                    <p className="text-slate-400 text-sm">Trend Direction</p>
+                                    <h3 className={`text-2xl font-bold ${prediction?.predicted_delta > 0 ? 'text-rose-400' : 'text-emerald-400'}`}>
+                                        {prediction ? (prediction.predicted_delta > 0 ? '▲ UP' : '▼ DOWN') : '---'}
+                                    </h3>
+                                </div>
+                            </div>
+
+                            {/* Chart */}
+                            <div className="glass p-8 rounded-2xl h-[400px]">
+                                <h3 className="text-lg font-semibold mb-4">Price Trend Analysis</h3>
+                                <ResponsiveContainer width="100%" height="100%">
+                                    <AreaChart data={chartData}>
+                                        <defs>
+                                            <linearGradient id="colorPrice" x1="0" y1="0" x2="0" y2="1">
+                                                <stop offset="5%" stopColor="#38bdf8" stopOpacity={0.3}/>
+                                                <stop offset="95%" stopColor="#38bdf8" stopOpacity={0}/>
+                                            </linearGradient>
+                                        </defs>
+                                        <CartesianGrid strokeDasharray="3 3" stroke="#334155" vertical={false} />
+                                        <XAxis dataKey="name" stroke="#94a3b8" />
+                                        <YAxis domain={['auto', 'auto']} stroke="#94a3b8" />
+                                        <Tooltip 
+                                            contentStyle={{ backgroundColor: '#1e293b', border: 'none', borderRadius: '12px' }}
+                                        />
+                                        <Area type="monotone" dataKey="price" stroke="#38bdf8" strokeWidth={3} fillOpacity={1} fill="url(#colorPrice)" />
+                                    </AreaChart>
+                                </ResponsiveContainer>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            );
+        };
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

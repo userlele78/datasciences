@@ -1,0 +1,15 @@
+/* App.css - Custom styles for Ant Design layout */
+.ant-layout-header {
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  z-index: 1;
+}
+
+.ant-card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+
+.ant-statistic-title {
+  font-weight: 600;
+  color: #8c8c8c;
+}

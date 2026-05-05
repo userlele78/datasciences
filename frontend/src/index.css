@@ -1,0 +1,14 @@
+/* index.css - Reset and basic settings */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  padding: 0;
+  background-color: #f0f2f5; /* Light grey for AntD layout */
+}
+
+#root {
+  width: 100%;
+}

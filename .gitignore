@@ -1,0 +1,58 @@
+# --- Python (Backend) ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+.venv
+venv/
+ENV/
+
+# --- Node.js (Frontend) ---
+node_modules/
+frontend/dist/
+frontend/build/
+.eslintcache
+.stylelintcache
+*.log
+package-lock.json
+
+# --- Data Science & Models ---
+# Thường chúng ta sẽ ignore các file dữ liệu lớn và file mô hình binary
+# Nhưng nếu bạn muốn lưu lại mô hình nhỏ, có thể comment các dòng dưới đây
+models/*.pkl
+data/raw/*.csv
+data/processed/*.csv
+logs/*.png
+logs/*.txt
+
+# --- IDE & OS ---
+.vscode/
+.idea/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# --- Environment Secrets ---
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
