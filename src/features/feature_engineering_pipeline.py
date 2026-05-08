@@ -6,7 +6,7 @@ from sklearn.cluster import KMeans
 
 # Configuration
 INPUT_PATH = r"f:\Project\DataSciences\clean_data.csv"
-OUTPUT_PATH = r"f:\Project\DataSciences\feature_dataset.csv"
+OUTPUT_PATH = r"f:\Project\DataSciences\feature_dataset1.csv"
 REPORT_PATH = r"f:\Project\DataSciences\feature_engineering_report.md"
 
 def engineer_features():
@@ -36,8 +36,8 @@ def engineer_features():
     features['date'] = df['date']
     
     # Lagged Price (t, t-1, t-6) -> effectively (t-1, t-2, t-7) relative to target_next
-    features['price_lag_0'] = df[target]
-    features['price_lag_1'] = df[target].shift(1)
+    # features['price_lag_0'] = df[target]
+    # features['price_lag_1'] = df[target].shift(1)
     features['price_lag_6'] = df[target].shift(6)
     
     # Lagged Brent (t, t-6)
@@ -62,23 +62,23 @@ def engineer_features():
     
     # --- 4. TARGET PREPARATION (t+1) ---
     # We are at time 't'. We want to predict 't+1'.
-    features['target_next_day'] = df[target].shift(-1)
-    #test feats
-    features['brent_zscore_90d'] = ((df['brent_oil'] - df['brent_oil'].rolling(90).mean()) / (df['brent_oil'].rolling(90).std() + 1e-9)).astype('float32')
-    features['brent_52w_pct'] = ((df['brent_oil'] - df['brent_oil'].rolling(252, min_periods=60).min()) / (df['brent_oil'].rolling(252, min_periods=60).max() - df['brent_oil'].rolling(252, min_periods=60).min() + 1e-9)).astype('float32')
-    features['brent_usd_vnd'] = (df['brent_oil'] * df['USD_VND_Data'] / 1000).astype('float32')
-    features['brent_usd_mom5d'] = features['brent_usd_vnd'].pct_change(5).astype('float32')
-    features['sp500_mom_10d'] = df['SP500'].pct_change(10).astype('float32')
-    features['sp500_roll14_mean'] = df['SP500'].shift(1).rolling(14).mean().astype('float32')
-    features['usd_vnd_mom7d'] = df['USD_VND_Data'].pct_change(7).astype('float32')
+    # features['target_next_day'] = df[target].shift(-1)
+    # #test feats
+    # features['brent_zscore_90d'] = ((df['brent_oil'] - df['brent_oil'].rolling(90).mean()) / (df['brent_oil'].rolling(90).std() + 1e-9)).astype('float32')
+    # features['brent_52w_pct'] = ((df['brent_oil'] - df['brent_oil'].rolling(252, min_periods=60).min()) / (df['brent_oil'].rolling(252, min_periods=60).max() - df['brent_oil'].rolling(252, min_periods=60).min() + 1e-9)).astype('float32')
+    # features['brent_usd_vnd'] = (df['brent_oil'] * df['USD_VND_Data'] / 1000).astype('float32')
+    # features['brent_usd_mom5d'] = features['brent_usd_vnd'].pct_change(5).astype('float32')
+    # features['sp500_mom_10d'] = df['SP500'].pct_change(10).astype('float32')
+    # features['sp500_roll14_mean'] = df['SP500'].shift(1).rolling(14).mean().astype('float32')
+    # features['usd_vnd_mom7d'] = df['USD_VND_Data'].pct_change(7).astype('float32')
     
-    df['day_of_week'] = df.index.dayofweek
-    features['month_sin'] = np.sin(df['month'] * 2 * np.pi / 12).astype('float32')
-    features['month_cos'] = np.cos(df['month'] * 2 * np.pi / 12).astype('float32')
-    features['dow_sin']   = np.sin(df['day_of_week'] * 2 * np.pi / 7).astype('float32')
-    features['dow_cos']   = np.cos(df['day_of_week'] * 2 * np.pi / 7).astype('float32')
-    features['week_sin']  = np.sin(df['week'] * 2 * np.pi / 52).astype('float32')
-    features['week_cos']  = np.cos(df['week'] * 2 * np.pi / 52).astype('float32')
+    # df['day_of_week'] = df.index.dayofweek
+    # features['month_sin'] = np.sin(df['month'] * 2 * np.pi / 12).astype('float32')
+    # features['month_cos'] = np.cos(df['month'] * 2 * np.pi / 12).astype('float32')
+    # features['dow_sin']   = np.sin(df['day_of_week'] * 2 * np.pi / 7).astype('float32')
+    # features['dow_cos']   = np.cos(df['day_of_week'] * 2 * np.pi / 7).astype('float32')
+    # features['week_sin']  = np.sin(df['week'] * 2 * np.pi / 52).astype('float32')
+    # features['week_cos']  = np.cos(df['week'] * 2 * np.pi / 52).astype('float32')
     # --- 5. CLEAN UP ---
     # Drop rows with NaNs (due to lags and rolling windows)
     # And drop the last row (since target_next_day is NaN)

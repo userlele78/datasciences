@@ -22,7 +22,7 @@ def generate_features_optimized(input_path, output_path):
     features['date'] = df['date']
     
     # Standard Features
-    features['price_lag_0'] = df[target]
+    # features['price_lag_0'] = df[target]
     features['brent_lag_0'] = df['brent_oil']
     features['brent_lag_7'] = df['brent_oil'].shift(7)
     features['brent_mean_30'] = df['brent_oil'].rolling(window=30).mean()
