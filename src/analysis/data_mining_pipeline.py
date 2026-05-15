@@ -5,10 +5,13 @@ import seaborn as sns
 from statsmodels.tsa.stattools import grangercausalitytests, adfuller
 from statsmodels.tsa.stattools import ccovf, ccf
 import os
+from pathlib import Path
+# Configuration
+BASE_DIR = Path(__file__).resolve().parents[2]
 
 # Configuration
-INPUT_PATH = r"f:\Project\DataSciences\clean_data.csv"
-OUTPUT_DIR = r"f:\Project\DataSciences\DataMining_Results"
+INPUT_PATH = BASE_DIR / "data" / "processed" / "clean_data.csv"
+OUTPUT_DIR = BASE_DIR / "logs" / "data_mining_report.md"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def run_data_mining():

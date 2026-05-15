@@ -8,10 +8,13 @@ from sklearn.decomposition import PCA
 from sklearn.preprocessing import StandardScaler
 from sklearn.cluster import KMeans
 import os
+from pathlib import Path
 
 # Configuration
-INPUT_PATH = r"f:\Project\DataSciences\clean_data.csv"
-OUTPUT_DIR = r"f:\Project\DataSciences\EDA_Results"
+BASE_DIR = Path(__file__).resolve().parents[2]
+
+INPUT_PATH = BASE_DIR / "data" / "processed" / "clean_data.csv"
+OUTPUT_DIR = BASE_DIR / "logs" / "eda_report"
 os.makedirs(OUTPUT_DIR, exist_ok=True)
 
 def run_full_eda():
